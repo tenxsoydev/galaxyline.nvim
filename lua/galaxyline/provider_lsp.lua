@@ -1,16 +1,13 @@
-local get_lsp_client = function (msg)
-  msg = msg or 'No Active Lsp'
-  local buf_ft = vim.api.nvim_buf_get_option(0,'filetype')
-  local clients = vim.lsp.get_active_clients()
-  if next(clients) == nil then
-    return msg
-  end
+local get_lsp_client = function(bufnr, msg)
+  msg = msg or 'Idle'
+  local clients = {}
+  local sep = '|'
 
-  for _,client in ipairs(clients) do
-    local filetypes = client.config.filetypes
-    if filetypes and vim.fn.index(filetypes,buf_ft) ~= -1 then
-      return client.name
-    end
+  for _, client in pairs(vim.lsp.buf_get_clients(bufnr or 0)) do
+    clients[#clients + 1] = client.name
+  end
+  if next(clients) then
+    return table.concat(clients, sep)
   end
   return msg
 end
@@ -18,3 +15,4 @@ end
 return {
   get_lsp_client = get_lsp_client
 }
+
